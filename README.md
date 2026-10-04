@@ -20,7 +20,7 @@ Needs Node 20 or newer and React 19.
 
 | Import | What |
 | --- | --- |
-| `@owload/text-editor/extension` | `extension` — the small descriptor (`id: "text"`, `.txt`, "New text file", 10 MiB limit). The editor is a separate chunk loaded by `extension.load()`. |
+| `@owload/text-editor/extension` | `extension` — the small descriptor (`id: "text"`, `.txt`, "New text file", 10 MiB limit, `preview`). The editor and the preview code are separate chunks loaded when needed. |
 | `@owload/text-editor` | `TextEditor` (the component) and the `decodeText` / `encodeText` helpers. |
 | `@owload/text-editor/style.css` | The styles, all scoped to `.te`; a `.dark` ancestor switches the palette. |
 
@@ -35,6 +35,7 @@ SDK's `EditorProps`; see the SDK's README.
   line endings is normalized to LF.
 - Save (button or Ctrl/Cmd+S) calls `onSave`; the unsaved-changes indicator and the Save button live in the
   editor's own slim bar. Closing, and asking about unsaved changes, are the host's job.
+- **Preview** (`extension.preview`, [ADR 0020](https://github.com/owload/owload-docs/blob/main/decisions/0020-extension-previews.md)): a PNG of the first lines of the file on a white portrait page, monospace, long lines cut with an ellipsis; `null` for an empty, blank or non-UTF-8 file or where there is no `OffscreenCanvas`.
 - `readOnly` shows the text without Save and ignores edits.
 
 ## Development

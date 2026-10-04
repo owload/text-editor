@@ -40,5 +40,6 @@ Use Node >= 20 (`.nvmrc` = 22). The default `node` on this machine may be older;
 src/extension.ts    the descriptor (plain object, type-only import from the SDK); load() is the lazy chunk
 src/text-editor.tsx the component; src/text-editor.css its scoped styles
 src/lib/text.ts     decodeText / encodeText: UTF-8 only, BOM and CRLF preserved
+src/lib/preview.ts  layoutTextPreview() / renderTextPreview(): the PNG preview; src/lib/canvas.ts the canvas adapter
 test/               component tests and the SDK conformance suite
 ```

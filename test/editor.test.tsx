@@ -29,6 +29,11 @@ async function render(data: Uint8Array | null, props: { readOnly?: boolean } = {
 }
 
 describe('the descriptor', () => {
+  it('offers a preview that is lazy and gives nothing where there is no canvas', async () => {
+    expect(extension.preview).toBeTypeOf('function');
+    expect(await extension.preview(new TextEncoder().encode('hello'), { size: 360 })).toBeNull();
+  });
+
   it('is valid and offers "New text file"', () => {
     expect(validateExtension(extension)).toEqual([]);
     expect(extension.createNew.label).toBe('text file');

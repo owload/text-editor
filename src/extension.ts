@@ -14,4 +14,7 @@ export const extension = {
   // A textarea holds the whole text in the page; beyond this size it becomes unusable.
   maxFileBytes: 10 * 1024 * 1024,
   load: () => import('./text-editor').then((m) => ({ default: m.TextEditor })),
+  // The first lines on a white page, drawn lazily; null where there is no canvas or nothing to show.
+  preview: (data: Uint8Array, options: { size: number }) =>
+    import('./lib/preview').then((m) => m.renderTextPreview(data, options.size)),
 } satisfies EditorExtension;
