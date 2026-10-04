@@ -70,10 +70,13 @@ describe('layoutTextPreview', () => {
     expect(layoutTextPreview('a\r\n\tb', 360)!.lines).toEqual(['a', '  b']);
   });
 
-  it('drops blank lines at the end, and has nothing to show for a blank text', () => {
+  it('drops blank lines at the end, and gives an empty page for an empty or blank text', () => {
     expect(layoutTextPreview('a\n\n\n', 360)!.lines).toEqual(['a']);
-    expect(layoutTextPreview('', 360)).toBeNull();
-    expect(layoutTextPreview('  \n \n', 360)).toBeNull();
+    for (const text of ['', '  \n \n', '\n\n']) {
+      const layout = layoutTextPreview(text, 360)!;
+      expect(layout.lines).toEqual([]);
+      expect([layout.width, layout.height]).toEqual([360, 360]);
+    }
   });
 
   it('works at a small size and refuses an absurd one gracefully', () => {
@@ -99,10 +102,18 @@ describe('renderTextPreview', () => {
     expect(c.context.font).toMatch(/monospace$/);
   });
 
-  it('has no preview for an empty file, a blank one, or bytes that are not UTF-8', async () => {
+  it('draws an empty white page for an empty file or a blank one, so the tile shows there is nothing in it', async () => {
+    for (const data of [new Uint8Array(), enc('   \n')]) {
+      const c = fakeCanvas();
+      const png = await renderTextPreview(data, 360, c.factory);
+      expect([...png!]).toEqual([137, 80, 78, 71]);
+      expect(c.sizes).toEqual([[360, 360]]);
+      expect(c.calls).toEqual(['rect 0,0,360,360 #ffffff']); // the page and nothing on it
+    }
+  });
+
+  it('has no preview for bytes that are not UTF-8', async () => {
     const c = fakeCanvas();
-    expect(await renderTextPreview(new Uint8Array(), 360, c.factory)).toBeNull();
-    expect(await renderTextPreview(enc('   \n'), 360, c.factory)).toBeNull();
     expect(await renderTextPreview(new Uint8Array([0x68, 0xff, 0xfe]), 360, c.factory)).toBeNull();
     expect(c.sizes).toEqual([]);
   });

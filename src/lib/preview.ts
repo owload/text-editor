@@ -3,7 +3,8 @@ import { browserCanvas, type CanvasFactory } from './canvas';
 
 /**
  * The preview of a text file for the file grid (owload-docs/decisions/0020): a white square page with the
- * first lines of the text, starting in its top-left corner. Reads the file and changes nothing.
+ * first lines of the text, starting in its top-left corner; an empty page for an empty file. Reads the file and
+ * changes nothing.
  */
 
 export interface PreviewLayout {
@@ -55,7 +56,10 @@ export function layoutTextPreview(text: string, size: number): PreviewLayout | n
 
   const all = text.split('\n', MAX_LOOKED_AT + 1).map(clean);
   while (all.length > 0 && all[all.length - 1].trim() === '') all.pop();
-  if (all.length === 0) return null;
+  if (all.length === 0) {
+    // An empty or blank file: an empty page, so the tile shows that there is nothing in it.
+    return { width: side, height: side, padding, fontSize: smallest, lineHeight: Math.round(smallest * 1.35), lines: [] };
+  }
   const longest = all.reduce((n, line) => Math.max(n, line.length), 0);
 
   let m = metrics(side, padding, smallest);
