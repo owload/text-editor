@@ -1,0 +1,70 @@
+.te {
+  --te-bg: #fff;
+  --te-fg: #1f2328;
+  --te-muted: #656d76;
+  --te-line: #d8dee4;
+  --te-accent: #1f2328;
+  --te-warn: #b45309;
+  --te-error: #d1242f;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  box-sizing: border-box;
+  background: var(--te-bg);
+  color: var(--te-fg);
+  font: 13px/1.4 system-ui, -apple-system, sans-serif;
+}
+.dark .te {
+  --te-bg: #14171a;
+  --te-fg: #e6edf3;
+  --te-muted: #8b949e;
+  --te-line: #30363d;
+  --te-accent: #e6edf3;
+  --te-warn: #f59e0b;
+  --te-error: #f85149;
+}
+.te-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 16px;
+  height: 48px;
+  flex: none;
+  border-bottom: 1px solid var(--te-line);
+}
+.te-name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 500;
+}
+.te-dirty { color: var(--te-warn); font-size: 12px; white-space: nowrap; }
+.te .te-save {
+  font: inherit;
+  padding: 5px 16px;
+  border-radius: 6px;
+  border: 1px solid var(--te-accent);
+  background: var(--te-accent);
+  color: var(--te-bg);
+  cursor: pointer;
+}
+.te .te-save:disabled { opacity: 0.4; cursor: default; }
+.te-area {
+  flex: 1;
+  min-height: 0;
+  resize: none;
+  border: 0;
+  outline: none;
+  padding: 16px;
+  box-sizing: border-box;
+  background: var(--te-bg);
+  color: var(--te-fg);
+  font: 13px/1.5 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  tab-size: 4;
+}
+.te-error { color: var(--te-error); }
+.te-banner { margin: 0; padding: 6px 16px; flex: none; }
+.te-state { margin: 0; padding: 24px 16px; }
