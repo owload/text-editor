@@ -2,8 +2,8 @@ import { NotUtf8Error, decodeText } from './text';
 import { browserCanvas, type CanvasFactory } from './canvas';
 
 /**
- * The preview of a text file for the file grid (owload-docs/decisions/0020): a white page with the
- * first lines of the text. Reads the file and changes nothing.
+ * The preview of a text file for the file grid (owload-docs/decisions/0020): a white square page with the
+ * first lines of the text, starting in its top-left corner. Reads the file and changes nothing.
  */
 
 export interface PreviewLayout {
@@ -19,29 +19,59 @@ const MAX_SIDE = 4096;
 const ELLIPSIS = '…';
 /** Monospace glyphs are about this wide relative to the font size. */
 const CHAR_WIDTH = 0.6;
+/** Only this many lines of the text are looked at; a page never shows more at the smallest font. */
+const MAX_LOOKED_AT = 200;
 
-/** Positions the first lines of `text` on a portrait page whose height is `size`. */
-export function layoutTextPreview(text: string, size: number): PreviewLayout | null {
-  const height = Math.max(32, Math.min(Math.round(size), MAX_SIDE));
-  const width = Math.round(height * 0.75);
-  const padding = Math.round(height / 28);
-  // About 9 px at the 360 px thumbnail, the same effective size as the text of the spreadsheet preview.
-  const fontSize = Math.max(6, Math.round(height / 40));
+const clean = (raw: string) => raw.replaceAll('\r', '').replaceAll('\t', '  ');
+
+interface Metrics {
+  fontSize: number;
+  lineHeight: number;
+  maxChars: number;
+  maxLines: number;
+}
+
+function metrics(side: number, padding: number, fontSize: number): Metrics {
   const lineHeight = Math.round(fontSize * 1.35);
-  const maxChars = Math.floor((width - 2 * padding) / (fontSize * CHAR_WIDTH));
-  const maxLines = Math.floor((height - 2 * padding) / lineHeight);
-  if (maxChars < 1 || maxLines < 1) return null;
+  return {
+    fontSize,
+    lineHeight,
+    maxChars: Math.floor((side - 2 * padding) / (fontSize * CHAR_WIDTH)),
+    maxLines: Math.floor((side - 2 * padding) / lineHeight),
+  };
+}
 
-  // Only as much of the text as can be shown is looked at.
-  const lines: string[] = [];
-  for (const raw of text.split('\n')) {
-    const line = raw.replaceAll('\r', '').replaceAll('\t', '  ');
-    lines.push(line.length > maxChars ? line.slice(0, maxChars - 1) + ELLIPSIS : line);
-    if (lines.length === maxLines) break;
+/**
+ * Positions the first lines of `text` on a square page whose side is `size`. The file grid shows the
+ * picture filling a square tile, anchored at its top-left corner, so the page is square and the text starts
+ * in that corner. The font is as large as lets the whole text fit (about 24 px on a 360 px page for a few
+ * words, down to about 9 px for a long file), so a short text is readable and not a speck on an empty page.
+ */
+export function layoutTextPreview(text: string, size: number): PreviewLayout | null {
+  const side = Math.max(32, Math.min(Math.round(size), MAX_SIDE));
+  const padding = Math.round(side / 28);
+  const largest = Math.max(6, Math.round(side / 15));
+  const smallest = Math.max(6, Math.round(side / 40));
+
+  const all = text.split('\n', MAX_LOOKED_AT + 1).map(clean);
+  while (all.length > 0 && all[all.length - 1].trim() === '') all.pop();
+  if (all.length === 0) return null;
+  const longest = all.reduce((n, line) => Math.max(n, line.length), 0);
+
+  let m = metrics(side, padding, smallest);
+  if (m.maxChars < 1 || m.maxLines < 1) return null;
+  for (let font = largest; font >= smallest; font--) {
+    const candidate = metrics(side, padding, font);
+    if (candidate.maxChars >= longest && candidate.maxLines >= all.length) {
+      m = candidate;
+      break;
+    }
   }
-  while (lines.length > 0 && lines[lines.length - 1].trim() === '') lines.pop();
-  if (lines.every((l) => l.trim() === '')) return null;
-  return { width, height, padding, fontSize, lineHeight, lines };
+
+  const lines = all.slice(0, m.maxLines).map((line) =>
+    line.length > m.maxChars ? line.slice(0, m.maxChars - 1) + ELLIPSIS : line,
+  );
+  return { width: side, height: side, padding, fontSize: m.fontSize, lineHeight: m.lineHeight, lines };
 }
 
 /** The PNG of the first lines of a .txt file, at most `size` pixels high; null if there is nothing to show. */

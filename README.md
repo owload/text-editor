@@ -35,7 +35,7 @@ SDK's `EditorProps`; see the SDK's README.
   line endings is normalized to LF.
 - Save (button or Ctrl/Cmd+S) calls `onSave`; the unsaved-changes indicator and the Save button live in the
   editor's own slim bar. The close button in the bar calls `onClose`; asking about unsaved changes, and closing, are the host's job.
-- **Preview** (`extension.preview`, [ADR 0020](https://github.com/owload/owload-docs/blob/main/decisions/0020-extension-previews.md)): a PNG of the first lines of the file on a white portrait page, monospace, long lines cut with an ellipsis; `null` for an empty, blank or non-UTF-8 file or where there is no `OffscreenCanvas`.
+- **Preview** (`extension.preview`, [ADR 0020](https://github.com/owload/owload-docs/blob/main/decisions/0020-extension-previews.md)): a PNG of the first lines of the file on a white square page, monospace, starting in the top-left corner (the grid shows a preview filling its tile, anchored there); the font is as large as lets the whole text fit — about 24 px on a 360 px page for a few words, down to about 9 px for a long file — and lines that still do not fit are cut with an ellipsis; `null` for an empty, blank or non-UTF-8 file or where there is no `OffscreenCanvas`.
 - `readOnly` shows the text without Save and ignores edits.
 
 ## Development
