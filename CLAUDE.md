@@ -22,7 +22,7 @@ never edit it from here. See `README.md`.
   only in `src/`); no network access, no storage, no logging of content; nothing leaves the editor except through
   `onSave`; the contract's rules are checked by the SDK's conformance suite in `test/conformance.test.tsx` and must
   keep passing.
-- The editor never shows its own close or "discard changes?" dialog; the host owns closing.
+- The editor has a close control in its own bar (`aria-label="Close"`, calls `onClose`) but never shows a "discard changes?" dialog; the host asks about unsaved changes and removes the editor.
 - Keep it self-contained: no imports from the host app, no global CSS; every class is prefixed `te-` and every
   selector is scoped under `.te`.
 

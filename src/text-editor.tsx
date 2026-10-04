@@ -8,7 +8,7 @@ function toError(e: unknown): Error {
 }
 
 /** A plain-text editor that follows the Owload editor contract (owload-docs/decisions/0019). */
-export function TextEditor({ data, fileName, readOnly, onSave, onDirtyChange, onError, className, ref }: EditorProps) {
+export function TextEditor({ data, fileName, readOnly, onSave, onDirtyChange, onError, onClose, className, ref }: EditorProps) {
   // The file is read once, on mount; the buffer is not kept.
   const [loaded] = useState<{ doc: DecodedText } | { error: Error }>(() => {
     try {
@@ -71,9 +71,21 @@ export function TextEditor({ data, fileName, readOnly, onSave, onDirtyChange, on
 
   const root = `te${className ? ` ${className}` : ''}`;
 
+  const closeButton = (
+    <button className="te-close" aria-label="Close" title="Close" onClick={onClose} disabled={saving}>
+      <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true">
+        <path d="M3 3l10 10M13 3L3 13" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" fill="none" />
+      </svg>
+    </button>
+  );
+
   if (!doc) {
     return (
       <div className={root}>
+        <div className="te-bar">
+          <span className="te-name" title={fileName}>{fileName}</span>
+          {closeButton}
+        </div>
         <p role="alert" className="te-state te-error">{(loaded as { error: Error }).error instanceof NotUtf8Error
           ? (loaded as { error: Error }).error.message
           : 'The file could not be opened.'}</p>
@@ -91,6 +103,7 @@ export function TextEditor({ data, fileName, readOnly, onSave, onDirtyChange, on
             {saving ? 'Saving…' : 'Save'}
           </button>
         )}
+        {closeButton}
       </div>
       {saveError && <p role="alert" className="te-error te-banner">{saveError}</p>}
       <textarea

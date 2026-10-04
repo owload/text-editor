@@ -52,6 +52,21 @@
   cursor: pointer;
 }
 .te .te-save:disabled { opacity: 0.4; cursor: default; }
+.te .te-close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--te-muted);
+  cursor: pointer;
+}
+.te .te-close:hover:not(:disabled) { background: var(--te-line); color: var(--te-fg); }
+.te .te-close:disabled { opacity: 0.4; cursor: default; }
 .te-area {
   flex: 1;
   min-height: 0;

@@ -34,7 +34,7 @@ SDK's `EditorProps`; see the SDK's README.
 - A UTF-8 **byte order mark** and **CRLF** line endings are remembered and written back exactly; a file with mixed
   line endings is normalized to LF.
 - Save (button or Ctrl/Cmd+S) calls `onSave`; the unsaved-changes indicator and the Save button live in the
-  editor's own slim bar. Closing, and asking about unsaved changes, are the host's job.
+  editor's own slim bar. The close button in the bar calls `onClose`; asking about unsaved changes, and closing, are the host's job.
 - **Preview** (`extension.preview`, [ADR 0020](https://github.com/owload/owload-docs/blob/main/decisions/0020-extension-previews.md)): a PNG of the first lines of the file on a white portrait page, monospace, long lines cut with an ellipsis; `null` for an empty, blank or non-UTF-8 file or where there is no `OffscreenCanvas`.
 - `readOnly` shows the text without Save and ignores edits.
 

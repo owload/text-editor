@@ -15,8 +15,9 @@ async function render(data: Uint8Array | null, props: { readOnly?: boolean } = {
   const ref = createRef<EditorHandle>();
   const onSave = vi.fn();
   const onError = vi.fn();
+  const onClose = vi.fn();
   await act(async () => {
-    root.render(createElement(TextEditor, { data, fileName: 'a.txt', onSave, onError, ref, ...props }));
+    root.render(createElement(TextEditor, { data, fileName: 'a.txt', onSave, onError, onClose, ref, ...props }));
   });
   const area = container.querySelector('textarea');
   const type = async (value: string) => {
@@ -25,7 +26,7 @@ async function render(data: Uint8Array | null, props: { readOnly?: boolean } = {
       area!.dispatchEvent(new Event('input', { bubbles: true }));
     });
   };
-  return { container, ref, onSave, onError, area, type, unmount: () => act(async () => root.unmount()) };
+  return { container, ref, onSave, onError, onClose, area, type, unmount: () => act(async () => root.unmount()) };
 }
 
 describe('the descriptor', () => {
@@ -91,7 +92,7 @@ describe('TextEditor', () => {
     const ref = createRef<EditorHandle>();
     const onError = vi.fn();
     await act(async () => {
-      root.render(createElement(TextEditor, { data: null, fileName: 'a.txt', ref, onError, onSave: async () => { throw new Error('upload failed'); } }));
+      root.render(createElement(TextEditor, { data: null, fileName: 'a.txt', ref, onError, onClose: () => undefined, onSave: async () => { throw new Error('upload failed'); } }));
     });
     const area = container.querySelector('textarea')!;
     await act(async () => {
@@ -104,5 +105,17 @@ describe('TextEditor', () => {
     expect(ref.current!.isDirty()).toBe(true);
     expect(onError).toHaveBeenCalled();
     await act(async () => root.unmount());
+  });
+
+  it('has a close button in its bar that only calls onClose, also when the file cannot be opened', async () => {
+    const t = await render(new TextEncoder().encode('x'));
+    t.container.querySelector<HTMLButtonElement>('button[aria-label="Close"]')!.click();
+    expect(t.onClose).toHaveBeenCalledTimes(1);
+    expect(t.onSave).not.toHaveBeenCalled();
+    await t.unmount();
+
+    const broken = await render(new Uint8Array([0x68, 0xff, 0xfe]));
+    expect(broken.container.querySelector('button[aria-label="Close"]')).not.toBeNull();
+    await broken.unmount();
   });
 });
