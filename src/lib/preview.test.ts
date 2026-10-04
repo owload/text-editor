@@ -32,7 +32,7 @@ describe('layoutTextPreview', () => {
   it('keeps the first lines only, as many as fit', () => {
     const text = Array.from({ length: 500 }, (_, i) => `line ${i}`).join('\n');
     const layout = layoutTextPreview(text, 360)!;
-    expect(layout.lines.length).toBeGreaterThan(10);
+    expect(layout.lines.length).toBeGreaterThan(20); // a small font: a page shows about 30 lines
     expect(layout.lines.length).toBeLessThan(40);
     expect(layout.lines[0]).toBe('line 0');
     const used = layout.padding * 2 + layout.lines.length * layout.lineHeight;
@@ -54,6 +54,11 @@ describe('layoutTextPreview', () => {
     expect(layoutTextPreview('a\n\n\n', 360)!.lines).toEqual(['a']);
     expect(layoutTextPreview('', 360)).toBeNull();
     expect(layoutTextPreview('  \n \n', 360)).toBeNull();
+  });
+
+  it('uses a small font, about 9 px on a 360 px thumbnail, like the spreadsheet preview', () => {
+    expect(layoutTextPreview('a', 360)!.fontSize).toBe(9);
+    expect(layoutTextPreview('a', 128)!.fontSize).toBe(6); // never below 6 px
   });
 
   it('works at a small size and refuses an absurd one gracefully', () => {

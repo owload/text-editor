@@ -24,8 +24,9 @@ const CHAR_WIDTH = 0.6;
 export function layoutTextPreview(text: string, size: number): PreviewLayout | null {
   const height = Math.max(32, Math.min(Math.round(size), MAX_SIDE));
   const width = Math.round(height * 0.75);
-  const padding = Math.round(height / 24);
-  const fontSize = Math.max(6, Math.round(height / 26));
+  const padding = Math.round(height / 28);
+  // About 9 px at the 360 px thumbnail, the same effective size as the text of the spreadsheet preview.
+  const fontSize = Math.max(6, Math.round(height / 40));
   const lineHeight = Math.round(fontSize * 1.35);
   const maxChars = Math.floor((width - 2 * padding) / (fontSize * CHAR_WIDTH));
   const maxLines = Math.floor((height - 2 * padding) / lineHeight);
